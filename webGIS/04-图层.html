@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>图层</title>
+    <!-- 引入资源 -->
+    <script type="text/javascript">
+        window._AMapSecurityConfig = {
+            securityJsCode: '2232bd726c4670a1cf8718f13030e17b',
+        }
+    </script>
+    <script type="text/javascript" src="https://webapi.amap.com/maps?v=2.0&key=36a7ac0ea7c36a96ac6c59d7b71e1828"></script>
+    <!-- 三. 设置地图样式 -->
+    <!-- <style type="text/css">
+        h3{
+            font-size: 1.17em;
+            line-height: 1.4;
+            font-weight: bold;
+            margin: 2px;
+        }
+        hr{
+            margin: 1px;
+        }
+        html,body{
+            width: 100%;
+            height: 100%;
+            margin: 0px;
+        }
+        .map{
+            height: 100%;
+            width: 100%;
+            float: left;
+        }
+
+    </style> -->
+    <style>
+        html,
+        body,
+        #container {
+            width: 100%;
+            height: 100%;
+        }
+    </style>
+</head>
+<body>
+    <button onclick="add()">显示实时路况</button>
+    <button onclick="remove()">隐藏实时路况</button>
+    <!-- 二. 创建地图容器 -->
+    <div id="container"></div>
+    <!-- <div id="mapDiv" class="map" tabindex="0"></div> -->
+    <!-- 四. 加载地图 -->
+    <script>
+        
+        /* 
+            // 按照如下方法声明和创建一个标准图层，然后给地图对象设置layers属性，将其添加到地图中。
+            var layer = new AMap.createDefaultLayer({
+            zooms:[3, 20], // 可见级别
+            visable:true, // 是否可见
+            opacity:1, // 透明度
+            zIndex:0 // 叠加层级
+        })
+        var map = new AMap.Map('container', {
+            layers:[layer] // 当前只想显示标准图层时layers属性可以缺省
+        }) */
+
+        /* // 卫星图层与路网图层通常一起使用，这两个图层的创建和使用方法和TileLayer类似，只需要修改类名为对应的类名即可。
+        var satellite = new AMap.TileLayer.Satellite();
+        var roadNet = new AMap.TileLayer.RoadNet();
+        var map = new AMap.Map('container',{
+            zoom:10,
+            layers:[
+                    satellite,
+                    roadNet
+            ]
+        }); */
+
+        /* 实时交通图层用于展示当前时刻的道路交通状况，不同的颜色代表不同的拥堵程度，暗红色代表极度拥堵，绿色代表通畅，灰色代表路况不明。
+        作为一种特殊的TileLayer，使用方法同卫星、路网等官方图层一样。
+        特殊之处在于可以通过autoRefresh和interval参数指定是否自动刷新和刷新周期。 */
+        var map = new AMap.Map('container',{
+            zoom:10
+        })  
+        var traffic = new AMap.TileLayer.Traffic({
+            'autoRefresh': true,     //是否自动刷新，默认为false
+            'interval': 180,         //刷新间隔，默认180s
+        });
+        function add() {
+            map.add(traffic); //通过add方法添加图层
+        }
+
+        function remove() {
+            map.remove(traffic) //需要时可以移除
+        }
+        
+
+        /* 楼块图层专门用来展示矢量的建筑物层，与标准图层中的楼块要素的效果相同，所以使用时应先通过features属性隐藏地图的默认楼块。
+        二者区别在于，楼块图层显示的级别范围较标准图层中的楼块大，可以用来实现一些特殊的效果，3D 视图下还可以为楼块指定高度比例系数heightFactor。
+        与其他图层不同，楼块图层的有效级别范围为 [ 17, 20 ] 。 */
+        /* var buildings = new AMap.Buildings({
+            'zooms':[16,18],
+            'zIndex':10,
+            'heightFactor':2 //2倍于默认高度，3D下有效
+        }); //楼块图层
+        var map = new AMap.Map('container', {
+            center: [116.397428, 39.90923],
+            viewMode:'3D',
+            pitch:60,
+            rotation:-35,
+            features:['bg','road','point'],//隐藏默认楼块
+            mapStyle:'amap://styles/light',
+            layers: [new AMap.TileLayer.Satellite(),//高德默认标准图层
+                    buildings],
+            zoom: 17
+        }); */
+
+        /* 目前，在支持 WebGL 的浏览器上，我们默认会展示室内图层。
+        当地图处在合适的级别下，移动到有室内地图的地方就会自动显示室内地图。
+        可以通过监听地图 indoor_create 事件来获取这个室内图层，取得控制权。 */
+        /* var map = new AMap.Map('mapDiv', {
+            center:[116.519942, 39.924677],
+            showIndoorMap:true, //显示地图自带的室内地图图层
+            zoom:18
+        });
+
+        map.on('indoor_create',function(){
+            map.indoorMap.showIndoorMap('B000A856LJ',5);
+        }) */
+
+        /* 独立的室内图层
+        当然，也可以自己来创建室内图层，这时需要将地图的默认室内图层隐藏 */
+        /* var indoorMap;
+        AMap.plugin(['AMap.IndoorMap'], function() {
+            var indoorMap = new AMap.IndoorMap({alwaysShow:true});
+            //设定在没有矢量底图的时候也显示，默认情况下室内图仅在有矢量底图的时候显示
+            var map = new AMap.Map('mapDiv', {
+                showIndoorMap:false,//隐藏地图自带的室内地图图层
+                layers:[indoorMap,AMap.createDefaultLayer()]
+            });   
+            indoorMap.showIndoorMap('B000A9VHIG');
+        }); */
+
+    </script>
+</body>
+</html>

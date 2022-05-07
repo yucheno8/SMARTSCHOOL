@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>智慧校园</title>
+    <!-- 引入资源 -->
+    <!-- 引入css相关的资源 -->
+    <link rel="stylesheet" href="https://a.amap.com/jsapi_demos/static/demo-center/css/demo-center.css" />
+    <link rel="stylesheet" href="./css/index.css">
+
+    <!-- 引入js相关的资源 -->
+    <script type="text/javascript">
+        window._AMapSecurityConfig = {
+            // Code：使用自己申请的code + key
+            securityJsCode: '2232bd726c4670a1cf8718f13030e17b',
+        }
+    </script>
+    <script type="text/javascript"
+        src="https://webapi.amap.com/maps?v=2.0&key=36a7ac0ea7c36a96ac6c59d7b71e1828"></script>
+    <script src="./js/store.js"></script>
+
+</head>
+
+<body>
+    <!-- 创建地图容器 -->
+    <div id="container"></div>
+    <div class="info">点击地图标注热门的地点</div>
+
+    <script>
+        // 创建地图对象
+        var map = new AMap.Map('container',{
+            center: [114.402672, 30.518987],
+            zoom: 16,
+            viewMode: '3D',
+            pitch: 45,
+        })
+
+        // 使用控件
+        AMap.plugin(['AMap.ToolBar', 'AMap.Scale', 'AMap.ControlBar'], function() {
+            map.addControl(new AMap.ToolBar())
+            map.addControl(new AMap.Scale())
+            map.addControl(new AMap.ControlBar())
+        })
+
+
+        // 监听地图的点击事件
+        map.on('click', function(e) {
+            var marker = new AMap.Marker({
+                position: e.lnglat,
+            })
+            
+            map.add(marker)
+        })
+    </script>
+</body>
+
+</html>
